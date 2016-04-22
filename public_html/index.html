@@ -6,7 +6,60 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <!--CSS-->
+        <style type="text/css">
+            
+        </style>
+        
+        <!--load socket-->
+        <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
+        <!--Load jquery-->
+        <script src="https://code.jquery.com/jquery-1.12.3.min.js" 
+        integrity="sha256-aaODHAgvwQW1bFOGXMeX+pC4PZIPsvn2h1sArYOhgXQ="
+        crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+        integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw="
+        crossorigin="anonymous"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+               //load cards
+               //attach event handlers to buttons
+               //then execute following code
+               var socket = io.connect('localhost:3000');
+               socket.on('hand', function (cards) {
+                    loadGrid(cards);
+                });
+               socket.on('players', function (players) {
+                    loadStatus(players);
+                });
+            });
+            
+            //Loads the grid of cards
+            function loadGrid(cards){
+                
+            }
+            //Takes in an array of players and
+            //displays their info in the player table
+            //on the right side of the page
+            function loadStatus(players){
+                
+            }
+            
+            //Ajax handler
+            function doAjaxCall(method, cmd, params, fcn) {
+                $.ajax("http://localhost:3000/setgameserver/" + cmd,
+                {type: method,processData: true,data: params,dataType: "jsonp",
+                    success: function (result) { fcn(result) },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Error: " + jqXHR.responseText);
+                        alert("Error: " + textStatus);
+                        alert("Error: " + errorThrown);
+                    }
+                });
+            }
+            
+        </script>
+        <title>Set Game</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
