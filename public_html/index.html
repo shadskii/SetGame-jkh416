@@ -30,6 +30,9 @@ and open the template in the editor.
                 });
             });
             
+            //card object to hold picture of card and ID
+            function card()
+            
             //Loads the grid of cards
             function loadGrid(cards){
                 
@@ -41,7 +44,14 @@ and open the template in the editor.
                 
             }
             
+            //empty function
+            function nullFcn(result){ }
+            
             //Ajax handler
+            //method is the http method to be used in the call,
+            //cmd is the command/service we are calling on the node server,
+            //params is the JavaScript object holding the parameters for the Ajax call,
+            //fcn is the one parameter function to be called on successful completion
             function doAjaxCall(method, cmd, params, fcn) {
                 $.ajax("http://localhost:3000/setgameserver/" + cmd,
                 {type: method,processData: true,data: params,dataType: "jsonp",
