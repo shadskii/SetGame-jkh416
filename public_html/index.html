@@ -64,12 +64,33 @@ and open the template in the editor.
                 });
             }
             
+            function login(loginname){
+                doAjaxCall("GET","login",{loginName:loginname},
+                        function(result){
+                            myid = result;
+                            loadName();
+                        });
+            }
+            
+            function loadName(){
+                doAjaxCall("GET","loginname",{id: myId},
+                function(result){
+                    $(#lname).html(result);
+                });
+            }
+            
+            function addRow(){
+                doAjaxCall("GET","addrow",{id: myId}, nullFcn);
+            }
+            
         </script>
         <title>Set Game</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>TODO write content</div>
+        <div>
+            <span id="lname">Welcome</span>
+        </div>
     </body>
 </html>
