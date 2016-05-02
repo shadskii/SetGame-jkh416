@@ -8,7 +8,15 @@ and open the template in the editor.
     <head>
         <!--CSS-->
         <style type="text/css">
+            #lname{
+                font-size: 30px;
+            }
             
+            .container{
+                position: relative;
+                background-color: blueviolet;
+                height: 100%;
+            }
         </style>
         
         <!--load socket-->
@@ -72,25 +80,37 @@ and open the template in the editor.
                         });
             }
             
+            //Ajax call
             function loadName(){
                 doAjaxCall("GET","loginname",{id: myId},
                 function(result){
-                    $(#lname).html(result);
+                    $("#lname").html(result);
                 });
             }
             
+            //Ajax call
             function addRow(){
                 doAjaxCall("GET","addrow",{id: myId}, nullFcn);
             }
             
+            
+            //Ajax call
+            function submitSet(lst){
+                doAjaxCall("GET","submitset",{id: myId, cards: lst}, nullFcn);
+            }
         </script>
         <title>Set Game</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>
-            <span id="lname">Welcome</span>
+        <div class="container">
+            <table id="grid">
+                
+            </table>
+        </div>
+        <div class="container">
+            <span id="lname">Welcome to Set Game, </span>
         </div>
     </body>
 </html>
