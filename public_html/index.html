@@ -11,7 +11,7 @@ and open the template in the editor.
             #lname{
                 font-size: 40px;
             }
-            
+
             .container{
                 position: relative;
                 background-color: blueviolet;
@@ -43,6 +43,10 @@ and open the template in the editor.
                 text-align: left;
                 border-spacing: 15px;
                 width: 100px;
+                td:hover{
+                    opacity: .7;
+                    cursor: pointer;
+                }
             }
             #scores{
                 background-color: cadetblue;
@@ -50,106 +54,255 @@ and open the template in the editor.
                 padding-top: 20px;
                 width: available;
             }
+
+            #gameGrid{
+                td:hover{
+                    opacity: .7;
+                    cursor: pointer;
+                }
+
+                tr{
+                    padding: 10px;
+                }
+            }
+
+            .selected{
+                border-style: solid;
+                border-width: 1px;
+            }
+
         </style>
-        
+
         <!--load socket-->
         <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
         <!--Load jquery-->
         <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
         <script type="text/javascript">
-            
-            //globals
-            var myId;
-            var numCards;
-            var cardImages = [];
-            
-            $(document).ready(function(){
-                
-               //load cards
-               loadCards();
-               
-               //attach event handlers to buttons
-               attachEventHandlers();
 
-               //execute the following code
-               var socket = io.connect('localhost:3000');
-               socket.on('hand', function(cards) {
-                    loadGrid(cards);
-                });
-               socket.on('players', function(players) {
-                    loadStatus(players);
-                });
+            //globals
+            var myId; //player id
+            var numCards; //cards in hand
+            var cardImages = []; //array of images
+            var cardsSelected = []; //cards selected by player
+
+            $(document).ready(function () {
+
+                //load cards
+                //loadCards();
+
+                //attach event handlers to buttons
+                attachEventHandlers();
+
+                //execute the following code
+//               var socket = io.connect('localhost:3000');
+//               socket.on('hand', function(cards) {
+//                    loadGrid(cards);
+//                });
+//               socket.on('players', function(players) {
+//                    loadStatus(players);
+//                });
+                
+
+                //test
+//                var tPlayer = {
+//                    player: "hello1", score: "1738", row: true, shuffle: false, end: true
+//                };
+//                var tPlayer2 = {
+//                    player: "hello2", score: "1738", row: true, shuffle: false, end: true
+//                };
+//                var testPlayers = [];
+//                testPlayers.push(tPlayer);
+//                testPlayers.push(tPlayer2);
+//
+//                loadStatus(testPlayers);
+//
+                loadGrid([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
             });
-            
-            
-            function attachEventHandlers(){
-                $("#loginButton").click(function(){
+
+
+            function attachEventHandlers() {
+                $("#loginButton").click(function () {
                     var name = $("#loginName").val();
                     login(name);
+                    $("#loginName").val("");
                 });
-                
-                $("#set").click(function(){
-                    
+
+                $("#set").click(function () {
+                    if(isSet(cardsSelected)&&cardsSelected.length===3){
+                        //$("#lname").append(isSet(cardsSelected)); //testing
+                        submitSet(cardsSelected);
+                        unselectCards();
+                        
+                    }
                 });
-                
-                $("#addrow").click(function(){
+
+                $("#addrow").click(function () {
                     addRow();
                 });
-                
-                $("#shuffle").click(function(){
-                    
+
+                $("#shuffle").click(function () {
+                    shuffle();
                 });
-                
-                $("#endgame").click(function(){
-                    
+
+                $("#endgame").click(function () {
+                    endgame();
                 });
-            };
+
+                $("#gameGrid").on('click', 'img', function () {
+                    var src = $(this).attr('src');
+                    var imgNum = parseInt(src.split('/')[1].split("."));
+                        if (cardsSelected.length > 2) {
+                            alert("You may only selected 3 cards");
+                            return;
+                        }
+                        cardsSelected.push(imgNum);
+                        $(this).addClass("selected");
+                        if (cardsSelected.length === 3) {
+                            $("#lname").append(imgNum); //testing
+                        }
+                    });
             
-            function loadCards(){
+            
+            function unselectCards(){
+                $("#gameGrid img").each(function(){
+                    if ($(this).hasClass("selected")) {
+                        $(this).removeClass("selected");
+                    }
+                });
+                cardsSelected =[];
+            }
+            function loadCards() {
                 var imageArray = [];
                 var tmp;
-                for(var i=1;i<82;i++){
-                    if(i<10){
+                for (var i = 1; i < 82; i++) {
+                    if (i < 10) {
                         tmp = "0" + i;
-                    }else{
+                    } else {
                         tmp = i;
                     }
                     imageArray.push("images/" + tmp + ".gif");
+                    //$("#lname").append(tmp +", "); //testing
                 }
-                
-                for(var j=0;j<imageArray.length;j++){
-                    var cardImg = "<img src\"" + imageArray[j] + "\">";
+
+                for (var j = 0; j < imageArray.length; j++) {
+                    var cardImg = "<img src='" + imageArray[j] + "'>";
+
+                    //$("#lname").append(cardImg)); //testing
                     cardImages.push(cardImg);
                 }
             };
-            
+
             //Loads the grid of cards
-            function loadGrid(cards){
+            function loadGrid(cards) {
+                loadCards();
                 $("#gameGrid").empty();
                 var gridString;
-                for(var i=0;i<cards.length;i+=3){
-                    if((cards[i]<1)||(cards[i]>81)){
-                        
+                for (var i = 0; i < cards.length; i++) {
+                    if ((cards[i] < 1) || (cards[i] > 81)) {
+                        return;
                     }
-                    if((i%3)===0){
+                    if ((i % 3) === 0) {
                         gridString += "<tr>";
                     }
                     //add image
-                    gridString += ("<td>" + cardImages[cards[i]] + "</td>"
-                    
+                    gridString += ("<td>" + cardImages[cards[i] - 1] + "</td>");
+
+                    if (((i + 1) % 3 === 0) || ((i + 1) === cards.length)) {
+                        gridString += "</tr>";
+                        $("#gameGrid").append(gridString);
+                        gridString = "";
+                    }
                 }
-            };
+            }
+            ;
             //Takes in an array of players and
             //displays their info in the player table
             //on the right side of the page
-            function loadStatus(players){
-                
-            };
-            
-            //empty function
-            function nullFcn(result){ };
-            
+            function loadStatus(players) {
+                var appendStr
+                var player;
+                var rowValue;
+                var shuffleValue;
+                var endValue;
+                var name;
+                var score;
+
+                for (var i = 0; i < players.length; i++) {
+                    player = players[i];
+                    appendStr = "<tr>";
+                    name = "<td>";
+                    score = "<td>";
+                    rowValue = "<td>";
+                    shuffleValue = "<td>";
+                    endValue = "<td>";
+
+                    name += (player.player + "</td>");
+                    score += (player.score + "</td>");
+                    if (player.row) {
+                        rowValue += "*";
+                    }
+                    rowValue += "</td>";
+
+                    if (player.shuffle) {
+                        shuffleValue += "*";
+                    }
+                    shuffleValue += "</td>";
+
+                    if (player.end) {
+                        endValue += "*";
+                    }
+                    endValue += "</td>";
+
+                    appendStr += (name + score + rowValue + shuffleValue + endValue);
+                    appendStr += "</tr>";
+                    $("#scoreTable").append(appendStr);
+                }
+            }
+            ;
+
+            function isSet(ilist) {
+
+                function count(n) {
+                    return (n - 1) % 3 + 1;
+                }
+                ;
+                function color(n) { // 1=red 2=purple 3=green
+                    return (Math.ceil(n / 3) - 1) % 3 + 1;
+                }
+                ;
+                function shape(n) { // 1=squiggle 2=diamond 3=oval
+                    return (Math.ceil(n / 9) - 1) % 3 + 1;
+                }
+                ;
+                function fill(n) { // 1=filled 2=shaded 3=open
+                    return (Math.ceil(n / 27) - 1) % 3 + 1;
+                }
+                ;
+
+                function featureOk(feature) {
+                    if (feature(ilist[0]) == feature(ilist[1]) && feature(ilist[1]) == feature(ilist[2]))
+                        return true;
+                    else
+                    if (feature(ilist[0]) == feature(ilist[1]) || feature(ilist[1]) == feature(ilist[2]) || feature(ilist[0]) == feature(ilist[2]))
+                        return false;
+                    else
+                        return true;
+                }
+                ;
+
+                function setOk() {
+                    return featureOk(count) && featureOk(color) && featureOk(shape) && featureOk(fill);
+                }
+                ;
+
+                return setOk();
+            }
+            ;
+            //empty function for Ajax call
+            function nullFcn(result) { }
+            ;
+
             //Ajax handler
             //method is the http method to be used in the call,
             //cmd is the command/service we are calling on the node server,
@@ -157,57 +310,65 @@ and open the template in the editor.
             //fcn is the one parameter function to be called on successful completion
             function doAjaxCall(method, cmd, params, fcn) {
                 $.ajax("http://localhost:3000/setgameserver/" + cmd,
-                {
-                    type: method,
-                    processData: true,
-                    data: params,
-                    dataType: "jsonp",
-                    success: function (result) {
-                        fcn(result) 
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert("Error: " + jqXHR.responseText);
-                        alert("Error: " + textStatus);
-                        alert("Error: " + errorThrown);
-                    }
-                });
-            };
-            
-            function login(loginname){
-                doAjaxCall("GET","login",{loginName:loginname},
-                        function(result){
+                        {
+                            type: method,
+                            processData: true,
+                            data: params,
+                            dataType: "jsonp",
+                            success: function (result) {
+                                fcn(result)
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                alert("Error: " + jqXHR.responseText);
+                                alert("Error: " + textStatus);
+                                alert("Error: " + errorThrown);
+                            }
+                        });
+            }
+            ;
+
+            //Ajax call to login
+            function login(loginname) {
+                doAjaxCall("GET", "login", {loginName: loginname},
+                        function (result) {
                             myId = result;
                             loadName();
                         });
-            };
-            
-            //Ajax call
-            function loadName(){
-                doAjaxCall("GET","loginname",{id: myId},
-                function(result){
-                    $("#lname").append(result);
-                });
-            };
-            
-            //Ajax call
-            function addRow(){
-                doAjaxCall("GET", "addrow",{id: myId}, nullFcn);
-            };
-            
-            //Ajax call
-            function submitSet(lst){
-                doAjaxCall("GET", "submitset",{id: myId, cards: lst}, nullFcn);
-            };
-            
-            //Ajax call
-            function shuffle(){
+            }
+            ;
+
+            //Ajax call to get name
+            function loadName() {
+                doAjaxCall("GET", "loginname", {id: myId},
+                        function (result) {
+                            $("#lname").append(result);
+                        });
+            }
+            ;
+
+            //Ajax call add row
+            function addRow() {
+                doAjaxCall("GET", "addrow", {id: myId}, nullFcn);
+            }
+            ;
+
+            //Ajax call to set
+            function submitSet(lst) {
+                doAjaxCall("GET", "submitset", {id: myId, cards: lst}, nullFcn);
+            }
+            ;
+
+            //Ajax call to shuffle
+            function shuffle() {
                 doAjaxCall("GET", "shuffle", {id: myId}, nullFcn);
-            };
-            
-            //Ajax call
-            function endGame(){
+            }
+            ;
+
+            //Ajax call end game
+            function endGame() {
                 doAjaxCall("GET", "endgame", {id: myId}, nullFcn);
-            };
+            }
+            ;
         </script>
         <title>Set Game</title>
         <meta charset="UTF-8">
@@ -220,7 +381,7 @@ and open the template in the editor.
         <div class="container">
             <div class="container-left">
                 <table id="gameGrid">
-                
+
                 </table>
             </div>
             <div class="container-right">
@@ -239,7 +400,7 @@ and open the template in the editor.
                         <input type="button" id="shuffle" value="Shuffle">
                         <input type="button" id="endgame" value="End Game">
                     </div>
-                    
+
                 </div>
                 <div id="scores">
                     <table id="scoreTable">
