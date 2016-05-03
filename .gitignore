@@ -12,3 +12,17 @@ server/node_modules/socket.io/Makefile
 
 nbproject/private/private.xml
 >>>>>>> Stashed changes
+
+server/node_modules/socket.io/node_modules/debug/.npmignore
+
+server/node_modules/socket.io/node_modules/debug/.jshintrc
+
+server/node_modules/socket.io/node_modules/debug/.npmignore
+
+server/node_modules/socket.io/node_modules/debug/bower.json
+
+server/node_modules/socket.io/node_modules/debug/.npmignore
+
+server/node_modules/socket.io/node_modules/debug/.jshintrc
+
+server/node_modules/socket.io/node_modules/debug/.jshintrc
