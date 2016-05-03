@@ -1,0 +1,9 @@
+*.npmignore
+server/node_modules/socket.io/.travis.yml
+server/node_modules/socket.io/lib/index.js
+server/node_modules/socket.io/lib/client.js
+server/node_modules/socket.io/lib/socket.js
+server/node_modules/socket.io/LICENSE
+server/node_modules/socket.io/lib/namespace.js
+server/node_modules/socket.io/History.md
+server/node_modules/socket.io/Makefile
